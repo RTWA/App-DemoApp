@@ -1,0 +1,102 @@
+{
+    "name": "Demo App",
+    "slug": "DemoApp",
+    "version": "1.0.0",
+    "description": "A simple demo app for WebApps",
+    "icon": "[\"fas\", \"ghost\"]",
+    "author": "WebApps",
+    "menu": [
+        {
+            "action": "teams",
+            "text": "Manage Teams",
+            "permission": "app.demoApp.manageTeams"
+        },
+        {
+            "action": "members",
+            "text": "Manage Members",
+            "permission": "app.demoApp.manageMembers"
+        },
+        {
+            "action": "points",
+            "text": "Add Points",
+            "permission": "app.demoApp.addPoints"
+        },
+        {
+            "action": "settings",
+            "text": "App Settings",
+            "permission": "app.demoApp.appSettings"
+        }
+    ],
+    "routes": [
+        {
+            "path": "/teams",
+            "name": "Manage Teams",
+            "exact": true,
+            "component": "Teams",
+            "permission": "app.demoApp.manageTeams"
+        },
+        {
+            "path": "/members",
+            "name": "Manage Members",
+            "exact": true,
+            "component": "Members",
+            "permission": "app.demoApp.manageMembers"
+        },
+        {
+            "path": "/points",
+            "name": "Add Points",
+            "exact": true,
+            "component": "AddPoints",
+            "permission": "app.demoApp.addPoints"
+        },
+        {
+            "path": "/settings",
+            "name": "App Settings",
+            "exact": true,
+            "component": "DemoAppSettings",
+            "permission": "app.demoApp.appSettings"
+        }
+    ],
+    "permissions": [
+        {
+            "name": "app.demoApp.manageTeams",
+            "title": "Manage Teams",
+            "guard": "web",
+            "admin": true
+        },
+        {
+            "name": "app.demoApp.manageMembers",
+            "title": "Manage Members",
+            "guard": "web",
+            "admin": true
+        },
+        {
+            "name": "app.demoApp.viewPoints",
+            "title": "View Team and Members Points",
+            "guard": "web",
+            "admin": true
+        },
+        {
+            "name": "app.demoApp.addPoints",
+            "title": "Add points to Teams and Members",
+            "guard": "web",
+            "admin": true
+        },
+        {
+            "name": "app.demoApp.appSettings",
+            "title": "Manage App Settings",
+            "guard": "web",
+            "admin": true
+        }
+    ],
+    "settings": [
+        {
+            "key": "apps.demoApp.teamWinPoints",
+            "value": 5
+        },
+        {
+            "key": "apps.demoApp.memberWinPoints",
+            "value": 10
+        }
+    ]
+}
