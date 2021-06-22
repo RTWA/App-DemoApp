@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { ToastProvider } from 'react-toast-notifications';
-
 import { WebApps } from 'webapps-react';
 
 import { AddPoints, DemoAppSettings, Members, Teams } from './components';

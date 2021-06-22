@@ -124,15 +124,13 @@ class AppManagerController extends Controller
                                                     : $setting['value']);
             }
         }
-        ApplicationSettings::save();
     }
 
     private function dropSettings()
     {
         foreach ($this->manifest['settings'] as $setting) {
-            ApplicationSettings::forget($setting['key']);
+            ApplicationSettings::delete($setting['key']);
         }
-        ApplicationSettings::save();
     }
 
     private function copyAppJS()
