@@ -5,7 +5,6 @@ namespace WebApps\Apps\DemoApp\Providers;
 use App\Models\App;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 
 class DemoAppServiceProvider extends ServiceProvider
 {
@@ -27,6 +26,10 @@ class DemoAppServiceProvider extends ServiceProvider
         $folders = ["Controllers", "Models"];
         foreach ($folders as $folder) {
             foreach (GLOB(__DIR__.'/../'.$folder.'/*.php') as $file) {
+                $className = str_replace(__DIR__.'/../'.$folder.'/', '', str_replace('.php', '', $file));
+                if ($folder === 'Controllers' && class_exists($this->namespace.'\\'.$className)) {
+                    return;
+                }
                 include $file;
             }
         }
