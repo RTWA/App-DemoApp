@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use RobTrehy\LaravelApplicationSettings\ApplicationSettings;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Akaunting\Setting\Facade as Setting;
 
 class AppManagerController extends Controller
 {
@@ -118,21 +118,21 @@ class AppManagerController extends Controller
     private function createSettings()
     {
         foreach ($this->manifest['settings'] as $setting) {
-            if (Setting::get($setting['key']) === null) {
-                Setting::set($setting['key'], (is_array($setting['value']))
+            if (ApplicationSettings::get($setting['key']) === null) {
+                ApplicationSettings::set($setting['key'], (is_array($setting['value']))
                                                     ? json_encode($setting['value'])
                                                     : $setting['value']);
             }
         }
-        Setting::save();
+        ApplicationSettings::save();
     }
 
     private function dropSettings()
     {
         foreach ($this->manifest['settings'] as $setting) {
-            Setting::forget($setting['key']);
+            ApplicationSettings::forget($setting['key']);
         }
-        Setting::save();
+        ApplicationSettings::save();
     }
 
     private function copyAppJS()

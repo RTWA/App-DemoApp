@@ -2,9 +2,9 @@
 
 namespace WebApps\Apps\DemoApp\Controllers;
 
-use Akaunting\Setting\Facade as Setting;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use RobTrehy\LaravelApplicationSettings\ApplicationSettings;
 use WebApps\Apps\DemoApp\Models\Member;
 
 class MembersController extends Controller
@@ -17,10 +17,10 @@ class MembersController extends Controller
     public function addWin($id)
     {
         $member = Member::findOrFail($id);
-        $member->points = $member->points + Setting::get('apps.demoApp.memberWinPoints');
+        $member->points = $member->points + ApplicationSettings::get('apps.demoApp.memberWinPoints');
         $member->save();
 
-        $member->team->points = $member->team->points + Setting::get('apps.demoApp.teamWinPoints');
+        $member->team->points = $member->team->points + ApplicationSettings::get('apps.demoApp.teamWinPoints');
         $member->team->save();
 
         return response()->json(['success' => 'true']);
