@@ -22,7 +22,7 @@ class Team extends Model
 
     public function addWin()
     {
-        $this->points = $this->points + Setting::get('app.demoApp.teamPointsWin');
+        $this->points = $this->points + Setting::get('app.DemoApp.teamPointsWin');
         $this->save();
     }
 }
