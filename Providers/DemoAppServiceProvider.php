@@ -28,7 +28,7 @@ class DemoAppServiceProvider extends ServiceProvider
             foreach (GLOB(__DIR__.'/../'.$folder.'/*.php') as $file) {
                 $className = str_replace(__DIR__.'/../'.$folder.'/', '', str_replace('.php', '', $file));
                 if ($folder === 'Controllers' && class_exists($this->namespace.'\\'.$className)) {
-                    return;
+                    continue;
                 }
                 include $file;
             }
@@ -60,7 +60,7 @@ class DemoAppServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
             'prefix' => 'apps/DemoApp'
         ], function () {
-            require App::path() . 'DemoApp/routes/web.php';
+            require App::path() . 'DemoApp/Routes/web.php';
         });
     }
 
@@ -76,7 +76,7 @@ class DemoAppServiceProvider extends ServiceProvider
             'namespace' => $this->namespace,
             'prefix' => 'api/apps/DemoApp'
         ], function () {
-            require App::path() . 'DemoApp/routes/api.php';
+            require App::path() . 'DemoApp/Routes/api.php';
         });
     }
 }

@@ -87,13 +87,18 @@
             "admin": true
         }
     ],
-    "settings": [{
+    "settings": [
+        {
             "key": "app.DemoApp.teamWinPoints",
             "value": 5
         },
         {
             "key": "app.DemoApp.memberWinPoints",
             "value": 10
+        },
+        {
+            "key": "app.DemoApp.ExampleArraySetting",
+            "value": "[\"A\":true,\"B\":false]"
         }
     ]
 }
