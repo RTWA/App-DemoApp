@@ -33,7 +33,7 @@
     "react-confirm-alert": "^2.7.0",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.2.0",
-    "webapps-react": "^1.4.0"
+    "webapps-react": "^1.7.5"
   },
   "dependencies": {
     "react-toast-notifications": "^2.4.4"
