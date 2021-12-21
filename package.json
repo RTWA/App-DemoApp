@@ -35,7 +35,5 @@
     "react-router-dom": "^5.2.0",
     "webapps-react": "^1.7.5"
   },
-  "dependencies": {
-    "react-toast-notifications": "^2.4.4"
-  }
+  "dependencies": {}
 }
