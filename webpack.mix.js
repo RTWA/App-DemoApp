@@ -18,7 +18,7 @@ const mix = require('laravel-mix');
 mix
   .setPublicPath('public')
   .js('resources/js/app.js', 'public/DemoApp.js').react()
-  .js('resources/js/view.js', 'public/DemoApp_view.js').react()
+  .js('resources/js/view.js', 'public/DemoApp_View.js').react()
   /**
    * Uncomment these lines during development to copy your updated JS
    * file automatically (you must have installed and activated your app)
@@ -26,4 +26,4 @@ mix
    * Update the relative path to your WebApps Directory
    */
   .copy('public/DemoApp.js', '../../../WebApps/public/js/apps/DemoApp.js')
-  .copy('public/DemoApp_view.js', '../../../WebApps/public/js/apps/DemoApp_view.js')
+  .copy('public/DemoApp_View.js', '../../../WebApps/public/js/apps/DemoApp_View.js')

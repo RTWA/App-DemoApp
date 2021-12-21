@@ -12,6 +12,6 @@
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="DemoApp"></div>
 
-        <script src="{{ asset('js/apps/DemoApp_view.js') }}"></script>
+        <script src="{{ asset('js/apps/DemoApp_View.js') }}"></script>
     </body>
 </html>
