@@ -5,11 +5,8 @@ const ViewPoints = () => {
     const [teams, setTeams] = useState(null);
     const [members, setMembers] = useState(null);
 
-    useEffect(() => {
-        axios.get('/api/apps/DemoApp/teams')
-            .then(response => {
-                return response
-            })
+    useEffect(async () => {
+        await axios.get('/api/apps/DemoApp/teams')
             .then(json => {
                 setTeams(json.data.teams);
             })
@@ -17,10 +14,7 @@ const ViewPoints = () => {
                 // You should handle errors better in your App
                 console.log(error)
             });
-        axios.get('/api/apps/DemoApp/members')
-            .then(response => {
-                return response
-            })
+        await axios.get('/api/apps/DemoApp/members')
             .then(json => {
                 setMembers(json.data.members);
             })
@@ -34,7 +28,7 @@ const ViewPoints = () => {
         return (<div>No Teams or Members found</div>)
 
     return (
-        <div className="grid grid-cols-2 text-center">
+        <div className="grid gird-cols-1 md:grid-cols-2 gap-4 text-center">
             <div>
                 <h1 className="text-2xl font-bold">Team Points</h1>
                 {

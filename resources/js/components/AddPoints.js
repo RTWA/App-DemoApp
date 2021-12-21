@@ -8,12 +8,12 @@ const AddPoints = () => {
     const [teams, setTeams] = useState(null);
     const [members, setMembers] = useState(null);
 
-    useEffect(() => {
-        loadData();
+    useEffect(async () => {
+        await loadData();
     }, []);
 
-    const loadData = () => {
-        axios.get('/api/apps/DemoApp/teams')
+    const loadData = async () => {
+        await axios.get('/api/apps/DemoApp/teams')
             .then(json => {
                 setTeams(json.data.teams);
             })
@@ -21,7 +21,7 @@ const AddPoints = () => {
                 // You should handle errors better in your App
                 console.log(error)
             });
-        axios.get('/api/apps/DemoApp/members')
+            await axios.get('/api/apps/DemoApp/members')
             .then(json => {
                 setMembers(json.data.members);
             })
@@ -31,12 +31,12 @@ const AddPoints = () => {
             });
     }
 
-    const addWin = e => {
+    const addWin = async e => {
         e.preventDefault();
         let formData = new FormData();
         formData.append('_method', 'PUT');
 
-        axios.post(`/api/apps/DemoApp/member/${e.target.dataset.member}/win`, formData)
+        await axios.post(`/api/apps/DemoApp/member/${e.target.dataset.member}/win`, formData)
             .then(json => {
                 if (json.data.success) {
                     loadData();
@@ -52,13 +52,13 @@ const AddPoints = () => {
         return (<div>No Teams or Members found</div>)
 
     return (
-        <div className="grid grid-cols-2 text-center">
-            <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold w-full text-center">Team Points</h6>
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold w-full">Team Points</h6>
                 </div>
                 <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
+                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6 text-center">
                         {
                             teams.map(function (team, i) {
                                 return (<p key={i}>{team.name} - {team.points}</p>)
@@ -67,21 +67,25 @@ const AddPoints = () => {
                     </div>
                 </div>
             </div>
-            <div className="w-full px-4 py-6">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold w-full text-center">Member Points</h6>
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold w-full">Member Points</h6>
                 </div>
                 <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
                     <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
                         {
                             members.map(function (member, i) {
                                 return (
-                                    <div key={i} className="flex justify-around my-2">
-                                        <span className="w-24 text-left">{member.forename} {member.surname}</span>
-                                        <span className="text-left">({member.short_name})</span>
-                                        <span className="text-left">{member.team.name}</span>
-                                        <span className="text-left">{member.points}</span>
-                                        <Button size="small" data-member={member.id} onClick={addWin}>Add Win</Button>
+                                    <div key={i} className="flex flex-col md:flex-row items-center my-2">
+                                        <div className="w-full flex flex-row justify-between">
+                                            <span className="w-24 text-left">{member.forename} {member.surname}</span>
+                                            <span className="text-left">({member.short_name})</span>
+                                            <span className="text-left">{member.team.name}</span>
+                                        </div>
+                                        <div className="w-full flex flex-row justify-between md:ml-6">
+                                            <span className="text-left">{member.points}</span>
+                                            <Button size="small" data-member={member.id} onClick={addWin}>Add Win</Button>
+                                        </div>
                                     </div>
                                 )
                             })

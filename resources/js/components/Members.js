@@ -23,8 +23,8 @@ const Members = () => {
 
     const { addToast } = useToasts();
 
-    useEffect(() => {
-        axios.get('/api/apps/DemoApp/teams')
+    useEffect(async () => {
+        await axios.get('/api/apps/DemoApp/teams')
             .then(json => {
                 setTeams(json.data.teams);
             })
@@ -32,7 +32,7 @@ const Members = () => {
                 // You should handle errors better in your App
                 console.log(error);
             });
-        axios.get('/api/apps/DemoApp/members')
+        await axios.get('/api/apps/DemoApp/members')
             .then(json => {
                 setMembers(json.data.members);
             })
@@ -53,7 +53,7 @@ const Members = () => {
         (member === null) ? setNewMember({ ..._member }) : setMember({ ..._member });
     }
 
-    const saveMember = () => {
+    const saveMember = async () => {
         setState('saving');
 
         let _member = (member === null) ? newMember : member;
@@ -67,7 +67,7 @@ const Members = () => {
         formData.append('short_name', _member.short_name);
         formData.append('team_id', _member.team_id);
         formData.append('points', _member.points);
-        axios.post('/api/apps/DemoApp/member', formData)
+        await axios.post('/api/apps/DemoApp/member', formData)
             .then(json => {
                 addToast(`Member was ${(member === null) ? 'created' : 'updated'}`, { appearance: 'success' });
                 setMembers(json.data.members);
@@ -103,8 +103,8 @@ const Members = () => {
         });
     }
 
-    const deleteMember = member => {
-        axios.delete(`/api/apps/DemoApp/member/${member.id}`)
+    const deleteMember = async member => {
+        await axios.delete(`/api/apps/DemoApp/member/${member.id}`)
             .then(json => {
                 addToast("Member was deleted", { appearance: 'info' });
                 setMembers(json.data.members);
@@ -116,22 +116,26 @@ const Members = () => {
     }
 
     return (
-        <div className="grid grid-cols-2 text-center">
-            <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold">Current Members</h6>
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">Current Members</h6>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
+                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
                     <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
                         {
                             members.map(function (member, i) {
                                 return (
-                                    <div key={i} className="flex justify-around my-2 text-left">
-                                        <span className="w-24">{member.forename} {member.surname}</span>
-                                        <span>({member.short_name})</span>
-                                        <span>{member.team.name}</span>
-                                        <Button style="link" onClick={() => { setMember(member) }}>Edit</Button>
-                                        <Button style="link" color="red" onClick={() => { contextDelete(member) }}>Delete</Button>
+                                    <div key={i} className="flex flex-col md:flex-row items-center my-2">
+                                        <div className="w-full flex flex-row justify-between">
+                                            <span>{member.forename} {member.surname}</span>
+                                            <span>({member.short_name})</span>
+                                            <span>{member.team.name}</span>
+                                        </div>
+                                        <div className="flex flex-row md:ml-6">
+                                            <Button style="link" onClick={() => { setMember(member) }}>Edit</Button>
+                                            <Button style="link" color="red" onClick={() => { contextDelete(member) }}>Delete</Button>
+                                        </div>
                                     </div>
                                 )
                             })
@@ -141,78 +145,58 @@ const Members = () => {
                 </div>
             </div>
 
-            <div className="w-full px-4 py-6">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold">
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">
                         {(member === null) ? 'Create a new Member' : `Edit Member: ${member.short_name}`}
                     </h6>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
+                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
                     <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="forename">Forename</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="forename"
-                                    value={(member === null) ? newMember.forename : member.forename}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="forename">Forename</label>
+                            <Input type="text"
+                                name="forename"
+                                value={(member === null) ? newMember.forename : member.forename}
+                                onChange={onChange}
+                                state={state} />
                         </div>
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="surname">Surname</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="surname"
-                                    value={(member === null) ? newMember.surname : member.surname}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="surname">Surname</label>
+                            <Input type="text"
+                                name="surname"
+                                value={(member === null) ? newMember.surname : member.surname}
+                                onChange={onChange}
+                                state={state} />
                         </div>
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="short_name">Short Name</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="short_name"
-                                    value={(member === null) ? newMember.short_name : member.short_name}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="short_name">Short Name</label>
+                            <Input type="text"
+                                name="short_name"
+                                value={(member === null) ? newMember.short_name : member.short_name}
+                                onChange={onChange}
+                                state={state} />
                         </div>
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="team_id">Member Team</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <select name="team_id"
-                                    value={(member === null) ? newMember.team_id : member.team_id}
-                                    onChange={onChange}
-                                    className="input-field">
-                                    {
-                                        teams.map(function (team, i) {
-                                            return (<option key={i} value={team.id}>{team.name}</option>)
-                                        })
-                                    }
-                                </select>
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="team_id">Member Team</label>
+                            <select name="team_id"
+                                value={(member === null) ? newMember.team_id : member.team_id}
+                                onChange={onChange}
+                                className="input-field">
+                                {
+                                    teams.map(function (team, i) {
+                                        return (<option key={i} value={team.id}>{team.name}</option>)
+                                    })
+                                }
+                            </select>
                         </div>
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="points">Member Points</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="points"
-                                    value={(member === null) ? newMember.points : member.points}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="points">Member Points</label>
+                            <Input type="text"
+                                name="points"
+                                value={(member === null) ? newMember.points : member.points}
+                                onChange={onChange}
+                                state={state} />
                         </div>
                         <Button onClick={saveMember}>{(member === null) ? 'Create Member' : 'Save Changes'}</Button>
                     </div>

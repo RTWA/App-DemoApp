@@ -19,8 +19,8 @@ const Teams = () => {
 
     const { addToast } = useToasts();
 
-    useEffect(() => {
-        axios.get('/api/apps/DemoApp/teams')
+    useEffect(async () => {
+        await axios.get('/api/apps/DemoApp/teams')
             .then(json => {
                 setTeams(json.data.teams);
             })
@@ -38,7 +38,7 @@ const Teams = () => {
         (team === null) ? setNewTeam({ ..._team }) : setTeam({ ..._team });
     }
 
-    const saveTeam = () => {
+    const saveTeam = async () => {
         setState('saving');
 
         let _team = (team === null) ? newTeam : team;
@@ -49,7 +49,7 @@ const Teams = () => {
         }
         formData.append('name', _team.name);
         formData.append('points', _team.points);
-        axios.post('/api/apps/DemoApp/team', formData)
+        await axios.post('/api/apps/DemoApp/team', formData)
             .then(json => {
                 addToast(`Team was ${(team === null) ? 'created' : 'updated'}`, { appearance: 'success' });
                 setTeams(json.data.teams);
@@ -85,11 +85,8 @@ const Teams = () => {
         });
     }
 
-    const deleteTeam = team => {
-        axios.delete(`/api/apps/DemoApp/team/${team.id}`)
-            .then(response => {
-                return response
-            })
+    const deleteTeam = async team => {
+        await axios.delete(`/api/apps/DemoApp/team/${team.id}`)
             .then(json => {
                 addToast("Team was deleted", { appearance: 'info' });
                 setTeams(json.data.teams);
@@ -101,17 +98,17 @@ const Teams = () => {
     }
 
     return (
-        <div className="grid grid-cols-2 text-center">
-            <div className="w-full px-4 py-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold">Current Teams</h6>
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">Current Teams</h6>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
+                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
                     <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
                         {
                             teams.map(function (team, i) {
                                 return (
-                                    <div key={i} className="flex justify-around my-2 text-left">
+                                    <div key={i} className="flex items-center justify-around my-2">
                                         <span className="w-24">{team.name}</span>
                                         <Button style="link" onClick={() => { setTeam(team) }}>Edit</Button>
                                         <Button style="link" color="red" onClick={() => { contextDelete(team) }}>Delete</Button>
@@ -124,37 +121,29 @@ const Teams = () => {
                 </div>
             </div>
 
-            <div className="w-full px-4 py-6">
+            <div className="w-full">
                 <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 ml-6 inline-block cursor-pointer text-2xl font-bold">
+                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">
                         {(team === null) ? 'Create a new Team' : `Edit Team: ${team.name}`}
                     </h6>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
+                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
                     <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="name">Team Name</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="name"
-                                    value={(team === null) ? newTeam.name : team.name}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="name">Team Name</label>
+                            <Input type="text"
+                                name="name"
+                                value={(team === null) ? newTeam.name : team.name}
+                                onChange={onChange}
+                                state={state} />
                         </div>
-                        <div className="flex flex-auto px-4 lg:px-10 py-10 pt-5">
-                            <div className="w-full lg:w-3/12">
-                                <label className="block py-2 px-4" htmlFor="points">Team Points</label>
-                            </div>
-                            <div className="w-full lg:w-9/12">
-                                <Input type="text"
-                                    name="points"
-                                    value={(team === null) ? newTeam.points : team.points}
-                                    onChange={onChange}
-                                    state={state} />
-                            </div>
+                        <div className="flex flex-col md:flex-row py-4">
+                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="points">Team Points</label>
+                            <Input type="text"
+                                name="points"
+                                value={(team === null) ? newTeam.points : team.points}
+                                onChange={onChange}
+                                state={state} />
                         </div>
                         <Button onClick={saveTeam}>{(team === null) ? 'Create Team' : 'Save Changes'}</Button>
                     </div>
