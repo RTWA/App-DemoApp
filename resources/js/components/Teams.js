@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useToasts } from 'react-toast-notifications';
-import { ConfirmDeleteModal, Button, Input } from 'webapps-react';
+import { ConfirmDeleteModal, Button, Input, useToasts, APIClient } from 'webapps-react';
 import { confirmAlert } from 'react-confirm-alert';
-
-axios.defaults.withCredentials = true;
 
 const _new = {
     name: '',
@@ -19,8 +15,11 @@ const Teams = () => {
 
     const { addToast } = useToasts();
 
+    const APIController = new AbortController();
+    let timer = null;
+
     useEffect(async () => {
-        await axios.get('/api/apps/DemoApp/teams')
+        await APIClient('/api/apps/DemoApp/teams', undefined, { signal: APIController.signal })
             .then(json => {
                 setTeams(json.data.teams);
             })
@@ -28,6 +27,13 @@ const Teams = () => {
                 // You should handle errors better in your App
                 console.log(error);
             });
+
+        return () => {
+            APIController.abort();
+            if (timer) {
+                clearTimeout(timer);
+            }
+        }
     }, []);
 
     const onChange = e => {
@@ -42,33 +48,40 @@ const Teams = () => {
         setState('saving');
 
         let _team = (team === null) ? newTeam : team;
-        let formData = new FormData();
-        formData.append('_method', (team === null) ? 'POST' : 'PUT');
+        let data = { name: _team.name, points: _team.points }
         if (team !== null) {
-            formData.append('id', team.id);
+            data.id = team.id;
         }
-        formData.append('name', _team.name);
-        formData.append('points', _team.points);
-        await axios.post('/api/apps/DemoApp/team', formData)
+
+        let config = {
+            signal: APIController.signal,
+            method: (team === null) ? 'POST' : 'PUT'
+        }
+
+        await APIClient('/api/apps/DemoApp/team', data, config)
             .then(json => {
-                addToast(`Team was ${(team === null) ? 'created' : 'updated'}`, { appearance: 'success' });
+                addToast(`Team was ${(team === null) ? 'created' : 'updated'}`, '', { appearance: 'success' });
                 setTeams(json.data.teams);
                 setNewTeam(_new);
                 setTeam(null);
 
                 setState('saved');
-                setTimeout(function () {
+                timer = setTimeout(function () {
                     setState('');
+                    timer = null;
                 }, 2500);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
 
-                setState('error');
-                setTimeout(function () {
-                    setState('');
-                }, 2500);
+                    setState('error');
+                    timer = setTimeout(function () {
+                        setState('');
+                        timer = null;
+                    }, 2500);
+                }
             })
     }
 
@@ -86,25 +99,29 @@ const Teams = () => {
     }
 
     const deleteTeam = async team => {
-        await axios.delete(`/api/apps/DemoApp/team/${team.id}`)
+        await APIClient(`/api/apps/DemoApp/team/${team.id}`, undefined, { method: 'DELETE', signal: APIController.signal })
             .then(json => {
-                addToast("Team was deleted", { appearance: 'info' });
+                addToast("Team was deleted", '', { appearance: 'info' });
                 setTeams(json.data.teams);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
+                }
             });
     }
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="w-full">
-                <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">Current Teams</h6>
+        <div className="mt-10 sm:mt-0 py-0 sm:py-8">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1 flex justify-between">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Current Teams</h3>
+                    </div>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
+                <div className="mt-5 md:mt-0 md:col-span-2">
+                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
                         {
                             teams.map(function (team, i) {
                                 return (
@@ -116,40 +133,49 @@ const Teams = () => {
                                 )
                             })
                         }
+                    </div>
+
+                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
                         <Button onClick={() => { setTeam(null); setNewTeam(_new) }}>Create New Team</Button>
                     </div>
                 </div>
-            </div>
 
-            <div className="w-full">
-                <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">
-                        {(team === null) ? 'Create a new Team' : `Edit Team: ${team.name}`}
-                    </h6>
+                <div className="md:col-span-1 flex justify-between">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Create a new Team</h3>
+                    </div>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="name">Team Name</label>
-                            <Input type="text"
+
+                <div className="mt-5 md:mt-0 md:col-span-2">
+                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
+                        <div className="grid grid-cols-6 gap-6">
+                            <Input
+                                id="name"
                                 name="name"
+                                label="Team Name"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(team === null) ? newTeam.name : team.name}
                                 onChange={onChange}
                                 state={state} />
-                        </div>
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="points">Team Points</label>
-                            <Input type="text"
+                            <Input
+                                id="points"
                                 name="points"
+                                label="Team Points"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(team === null) ? newTeam.points : team.points}
                                 onChange={onChange}
                                 state={state} />
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
                         <Button onClick={saveTeam}>{(team === null) ? 'Create Team' : 'Save Changes'}</Button>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

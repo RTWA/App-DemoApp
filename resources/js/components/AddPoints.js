@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Button } from 'webapps-react';
+import { APIClient, Button } from 'webapps-react';
 
 axios.defaults.withCredentials = true;
 
@@ -8,43 +8,51 @@ const AddPoints = () => {
     const [teams, setTeams] = useState(null);
     const [members, setMembers] = useState(null);
 
+    const APIController = new AbortController();
+
     useEffect(async () => {
         await loadData();
+        return () => {
+            APIController.abort();
+        }
     }, []);
 
     const loadData = async () => {
-        await axios.get('/api/apps/DemoApp/teams')
+        await APIClient('/api/apps/DemoApp/teams', undefined, { signal: APIController.signal })
             .then(json => {
                 setTeams(json.data.teams);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error)
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error)
+                }
             });
-            await axios.get('/api/apps/DemoApp/members')
+        await APIClient('/api/apps/DemoApp/members', undefined, { signal: APIController.signal })
             .then(json => {
                 setMembers(json.data.members);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error)
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error)
+                }
             });
     }
 
     const addWin = async e => {
         e.preventDefault();
-        let formData = new FormData();
-        formData.append('_method', 'PUT');
-
-        await axios.post(`/api/apps/DemoApp/member/${e.target.dataset.member}/win`, formData)
+        await APIClient(`/api/apps/DemoApp/member/${e.target.dataset.member}/win`, undefined, { method: 'PUT', signal: APIController.signal })
             .then(json => {
                 if (json.data.success) {
                     loadData();
                 }
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error)
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error)
+                }
             });
     }
 

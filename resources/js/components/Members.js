@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useToasts } from 'react-toast-notifications';
-import { ConfirmDeleteModal, Button, Input } from 'webapps-react';
+import { ConfirmDeleteModal, Button, Input, useToasts, APIClient, Select } from 'webapps-react';
 import { confirmAlert } from 'react-confirm-alert';
-
-axios.defaults.withCredentials = true;
 
 const _new = {
     forename: '',
@@ -23,23 +19,37 @@ const Members = () => {
 
     const { addToast } = useToasts();
 
+    const APIController = new AbortController();
+    let timer = null;
+
     useEffect(async () => {
-        await axios.get('/api/apps/DemoApp/teams')
+        await APIClient('/api/apps/DemoApp/teams', undefined, { signal: APIController.signal })
             .then(json => {
                 setTeams(json.data.teams);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
+                }
             });
-        await axios.get('/api/apps/DemoApp/members')
+        await APIClient('/api/apps/DemoApp/members', undefined, { signal: APIController.signal })
             .then(json => {
                 setMembers(json.data.members);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
+                }
             });
+
+        return () => {
+            APIController.abort();
+            if (timer) {
+                clearTimeout(timer);
+            }
+        }
     }, []);
 
     const onChange = e => {
@@ -57,36 +67,46 @@ const Members = () => {
         setState('saving');
 
         let _member = (member === null) ? newMember : member;
-        let formData = new FormData();
-        formData.append('_method', (member === null) ? 'POST' : 'PUT');
-        if (member !== null) {
-            formData.append('id', member.id);
+        let data = {
+            forename: _member.forename,
+            surname: _member.surname,
+            short_name: _member.short_name,
+            team_id: _member.team_id,
+            points: _member.points
         }
-        formData.append('forename', _member.forename);
-        formData.append('surname', _member.surname);
-        formData.append('short_name', _member.short_name);
-        formData.append('team_id', _member.team_id);
-        formData.append('points', _member.points);
-        await axios.post('/api/apps/DemoApp/member', formData)
+        if (member !== null) {
+            data.id = member.id;
+        }
+
+        let config = {
+            signal: APIController.signal,
+            method: (member === null) ? 'POST' : 'PUT'
+        }
+
+        await APIClient('/api/apps/DemoApp/member', data, config)
             .then(json => {
-                addToast(`Member was ${(member === null) ? 'created' : 'updated'}`, { appearance: 'success' });
+                addToast(`Member was ${(member === null) ? 'created' : 'updated'}`, '', { appearance: 'success' });
                 setMembers(json.data.members);
                 setNewMember(_new);
                 setMember(null);
 
                 setState('saved');
-                setTimeout(function () {
+                timer = setTimeout(function () {
                     setState('');
+                    timer = null;
                 }, 2500);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
 
-                setState('error');
-                setTimeout(function () {
-                    setState('');
-                }, 2500);
+                    setState('error');
+                    timer = setTimeout(function () {
+                        setState('');
+                        timer = null;
+                    }, 2500);
+                }
             })
     }
 
@@ -104,25 +124,29 @@ const Members = () => {
     }
 
     const deleteMember = async member => {
-        await axios.delete(`/api/apps/DemoApp/member/${member.id}`)
+        await APIClient(`/api/apps/DemoApp/member/${member.id}`, undefined, { method: 'DELETE', signal: APIController.signal })
             .then(json => {
-                addToast("Member was deleted", { appearance: 'info' });
+                addToast("Member was deleted", '', { appearance: 'info' });
                 setMembers(json.data.members);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
+                }
             });
     }
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            <div className="w-full">
-                <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">Current Members</h6>
+        <div className="mt-10 sm:mt-0 py-0 sm:py-8">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1 flex justify-between">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Current Members</h3>
+                    </div>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
+                <div className="mt-5 md:mt-0 md:col-span-2">
+                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
                         {
                             members.map(function (member, i) {
                                 return (
@@ -140,64 +164,75 @@ const Members = () => {
                                 )
                             })
                         }
+                    </div>
+
+                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
                         <Button onClick={() => { setMember(null); setNewMember(_new) }}>Create New Member</Button>
                     </div>
                 </div>
-            </div>
 
-            <div className="w-full">
-                <div className="flex flex-row">
-                    <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">
-                        {(member === null) ? 'Create a new Member' : `Edit Member: ${member.short_name}`}
-                    </h6>
+                <div className="md:col-span-1 flex justify-between">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Create a new Member</h3>
+                    </div>
                 </div>
-                <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                    <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="forename">Forename</label>
-                            <Input type="text"
+
+                <div className="mt-5 md:mt-0 md:col-span-2">
+                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
+                        <div className="grid grid-cols-6 gap-6">
+                            <Input
+                                id="forename"
                                 name="forename"
+                                label="Forename"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(member === null) ? newMember.forename : member.forename}
                                 onChange={onChange}
                                 state={state} />
-                        </div>
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="surname">Surname</label>
-                            <Input type="text"
+                            <Input
+                                id="surname"
                                 name="surname"
+                                label="Surname"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(member === null) ? newMember.surname : member.surname}
                                 onChange={onChange}
                                 state={state} />
-                        </div>
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="short_name">Short Name</label>
-                            <Input type="text"
+                            <Input
+                                id="short_name"
                                 name="short_name"
+                                label="Short Name"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(member === null) ? newMember.short_name : member.short_name}
                                 onChange={onChange}
                                 state={state} />
-                        </div>
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="team_id">Member Team</label>
-                            <select name="team_id"
+                            <Select
+                                id="team_id"
+                                name="team_id"
+                                label="Member Team"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(member === null) ? newMember.team_id : member.team_id}
-                                onChange={onChange}
-                                className="input-field">
+                                onChange={onChange}>
                                 {
                                     teams.map(function (team, i) {
                                         return (<option key={i} value={team.id}>{team.name}</option>)
                                     })
                                 }
-                            </select>
-                        </div>
-                        <div className="flex flex-col md:flex-row py-4">
-                            <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="points">Member Points</label>
-                            <Input type="text"
+                            </Select>
+                            <Input
+                                id="points"
                                 name="points"
+                                label="Member Points"
+                                type="text"
+                                wrapperClassName="col-span-6 sm:col-span-4"
                                 value={(member === null) ? newMember.points : member.points}
                                 onChange={onChange}
                                 state={state} />
                         </div>
+                    </div>
+
+                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
                         <Button onClick={saveMember}>{(member === null) ? 'Create Member' : 'Save Changes'}</Button>
                     </div>
                 </div>

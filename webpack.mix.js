@@ -17,6 +17,13 @@ const mix = require('laravel-mix');
 
 mix
   .setPublicPath('public')
+  .webpackConfig({
+      resolve: {
+          fallback: {
+              path: require.resolve('path-browserify'),
+          }
+      }
+  })
   .js('resources/js/app.js', 'public/DemoApp.js').react()
   .js('resources/js/view.js', 'public/DemoApp_View.js').react()
   /**

@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { APIClient } from 'webapps-react';
 
 const ViewPoints = () => {
     const [teams, setTeams] = useState(null);
     const [members, setMembers] = useState(null);
 
+    const APIController = new AbortController();
+
     useEffect(async () => {
-        await axios.get('/api/apps/DemoApp/teams')
+        await APIClient('/api/apps/DemoApp/teams', undefined, { signal: APIController.signal })
             .then(json => {
                 setTeams(json.data.teams);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error)
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error)
+                }
             });
-        await axios.get('/api/apps/DemoApp/members')
+        await APIClient('/api/apps/DemoApp/members', undefined, { signal: APIController.signal })
             .then(json => {
                 setMembers(json.data.members);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error)
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error)
+                }
             });
+
+        return () => {
+            APIController.abort();
+        }
     }, []);
 
     if (teams === null || members === null)

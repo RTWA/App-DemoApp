@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Button, Input } from 'webapps-react';
-
-axios.defaults.withCredentials = true;
+import { APIClient, Button, Input } from 'webapps-react';
 
 const DemoAppSettings = () => {
     const [states, setStates] = useState({});
     const [settings, setSettings] = useState([]);
 
+    const APIController = new AbortController();
+    let timer = null;
+
     useEffect(async () => {
-        let formData = new FormData();
-        formData.append('key', JSON.stringify(["app.DemoApp.memberWinPoints", "app.DemoApp.teamWinPoints"]))
-        await axios.post('/api/setting', formData)
+        await APIClient('/api/setting', { key: JSON.stringify(["app.DemoApp.memberWinPoints", "app.DemoApp.teamWinPoints"]) }, { signal: APIController.signal })
             .then(json => {
                 setSettings({
                     memberWinPoints: json.data["app.DemoApp.memberWinPoints"],
@@ -19,9 +17,18 @@ const DemoAppSettings = () => {
                 });
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
+                }
             });
+
+        return () => {
+            APIController.abort();
+            if (timer) {
+                clearTimeout(timer);
+            }
+        }
     }, []);
 
     const onChange = e => {
@@ -36,57 +43,72 @@ const DemoAppSettings = () => {
         states[key] = 'saving';
         setStates({ ...states });
 
-        let formData = new FormData();
-        formData.append('_method', 'PUT');
-        formData.append('value', settings[key]);
-        await axios.post(`/api/setting/app.DemoApp.${key}`, formData)
+        await APIClient(`/api/setting/app.DemoApp.${key}`, { value: settings[key] }, { method: 'PUT', signal: APIController.signal })
             .then(() => {
                 states[key] = 'saved';
                 setStates({ ...states });
-                setTimeout(function () {
+                timer = setTimeout(function () {
                     states[key] = '';
                     setStates({ ...states });
+                    timer = null;
                 }, 2500);
             })
             .catch(error => {
-                // You should handle errors better in your App
-                console.log(error);
+                if (!error.status?.isAbort) {
+                    // You should handle errors better in your App
+                    console.log(error);
 
-                states[key] = 'error';
-                setStates({ ...states });
-                setTimeout(function () {
-                    states[key] = '';
+                    states[key] = 'error';
                     setStates({ ...states });
-                }, 2500);
+                    timer = setTimeout(function () {
+                        states[key] = '';
+                        setStates({ ...states });
+                        timer = null;
+                    }, 2500);
+                }
             })
     }
 
     return (
-        <div className="w-full">
-            <h6 className="text-gray-600 dark:text-gray-400 cursor-pointer text-2xl font-bold">Demo App Settings</h6>
-            <div className="flex flex-col min-w-0 break-words w-full my-6 shadow-lg rounded-lg bg-blue-gray-100 dark:bg-blue-gray-600 border-0 overflow-hidden">
-                <div className="bg-white dark:bg-gray-700 text-blue-gray-700 dark:text-blue-gray-100 mb-0 px-6 py-6">
-                    <div className="flex flex-col md:flex-row py-4">
-                        <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="memberWinPoints">Member Points per - win</label>
-                        <Input type="text"
-                            name="memberWinPoints"
-                            value={settings.memberWinPoints || ''}
-                            onChange={onChange}
-                            onBlur={() => saveSettings("memberWinPoints")}
-                            state={states['memberWinPoints']} />
+        <div className="mt-10 sm:mt-0 py-0 sm:py-8">
+            <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1 flex justify-between">
+                    <div className="px-4 sm:px-0">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">App Settings</h3>
                     </div>
-                    <div className="flex flex-col md:flex-row py-4">
-                        <label className="w-full md:w-4/12 md:py-2 font-medium md:font-normal text-sm md:text-base" htmlFor="teamWinPoints">Team Points per - win</label>
-                        <Input type="text"
-                            name="teamWinPoints"
-                            value={settings.teamWinPoints || ''}
-                            onChange={onChange}
-                            onBlur={() => saveSettings("teamWinPoints")}
-                            state={states['teamWinPoints']} />
+                </div>
+
+                <div className="mt-5 md:mt-0 md:col-span-2">
+                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
+                        <div className="grid grid-cols-6 gap-6">
+                            <Input
+                                id="memberWinPoints"
+                                name="memberWinPoints"
+                                label="Member Points per win"
+                                wrapperClassName="col-span-6 sm:col-span-4"
+                                type="text"
+                                value={settings.memberWinPoints || ''}
+                                onChange={onChange}
+                                onBlur={() => saveSettings("memberWinPoints")}
+                                state={states['memberWinPoints']} />
+                            <Input
+                                id="teamWinPoints"
+                                name="teamWinPoints"
+                                label="Team Points per win"
+                                wrapperClassName="col-span-6 sm:col-span-4"
+                                type="text"
+                                value={settings.teamWinPoints || ''}
+                                onChange={onChange}
+                                onBlur={() => saveSettings("teamWinPoints")}
+                                state={states['teamWinPoints']} />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
+                        <Button href="/apps/DemoApp/view/points" target="_blank">View Current Scores</Button>
                     </div>
                 </div>
             </div>
-            <Button href="/apps/DemoApp/view/points" target="_blank">View Current Scores</Button>
         </div>
     )
 }
