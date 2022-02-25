@@ -1,3 +1,9 @@
+# Version 1.0.2
+## Whats's Changed?
+- Speed improvements
+- Security improvements
+- UI improvements
+
 # Version 1.0.1
 ## What's New?
 - Demo App is now Mobile Friendly!
