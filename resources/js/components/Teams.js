@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ConfirmDeleteModal, Button, Input, useToasts, APIClient } from 'webapps-react';
+import { ConfirmDeleteModal, Button, Input, useToasts, APIClient, PageWrapper } from 'webapps-react';
 import { confirmAlert } from 'react-confirm-alert';
 
 const _new = {
@@ -113,69 +113,50 @@ const Teams = () => {
     }
 
     return (
-        <div className="mt-10 sm:mt-0 py-0 sm:py-8">
-            <div className="md:grid md:grid-cols-3 md:gap-6">
-                <div className="md:col-span-1 flex justify-between">
+        <PageWrapper>
+            <div className="grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1 flex flex-col justify-between">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Current Teams</h3>
                     </div>
-                </div>
-                <div className="mt-5 md:mt-0 md:col-span-2">
-                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
-                        {
-                            teams.map(function (team, i) {
-                                return (
-                                    <div key={i} className="flex items-center justify-around my-2">
-                                        <span className="w-24">{team.name}</span>
-                                        <Button style="link" onClick={() => { setTeam(team) }}>Edit</Button>
-                                        <Button style="link" color="red" onClick={() => { contextDelete(team) }}>Delete</Button>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-
-                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-                        <Button onClick={() => { setTeam(null); setNewTeam(_new) }}>Create New Team</Button>
-                    </div>
+                    {
+                        teams.map(function (team, i) {
+                            return (
+                                <div key={i} className="flex items-center justify-around my-2">
+                                    <span className="w-24">{team.name}</span>
+                                    <Button type="link" onClick={() => { setTeam(team) }}>Edit</Button>
+                                    <Button type="link" color="red" onClick={() => { contextDelete(team) }}>Delete</Button>
+                                </div>
+                            )
+                        })
+                    }
+                    <Button onClick={() => { setTeam(null); setNewTeam(_new) }}>Create New Team</Button>
                 </div>
 
-                <div className="md:col-span-1 flex justify-between">
+                <div className="md:col-span-1 flex flex-col justify-between">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Create a new Team</h3>
                     </div>
-                </div>
-
-                <div className="mt-5 md:mt-0 md:col-span-2">
-                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
-                        <div className="grid grid-cols-6 gap-6">
-                            <Input
-                                id="name"
-                                name="name"
-                                label="Team Name"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(team === null) ? newTeam.name : team.name}
-                                onChange={onChange}
-                                state={state} />
-                            <Input
-                                id="points"
-                                name="points"
-                                label="Team Points"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(team === null) ? newTeam.points : team.points}
-                                onChange={onChange}
-                                state={state} />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-                        <Button onClick={saveTeam}>{(team === null) ? 'Create Team' : 'Save Changes'}</Button>
-                    </div>
+                    <Input
+                        id="name"
+                        name="name"
+                        label="Team Name"
+                        type="text"
+                        value={(team === null) ? newTeam.name : team.name}
+                        onChange={onChange}
+                        state={state} />
+                    <Input
+                        id="points"
+                        name="points"
+                        label="Team Points"
+                        type="text"
+                        value={(team === null) ? newTeam.points : team.points}
+                        onChange={onChange}
+                        state={state} />
+                    <Button onClick={saveTeam}>{(team === null) ? 'Create Team' : 'Save Changes'}</Button>
                 </div>
             </div>
-        </div >
+        </PageWrapper >
     )
 }
 

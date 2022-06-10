@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ConfirmDeleteModal, Button, Input, useToasts, APIClient, Select } from 'webapps-react';
+import { ConfirmDeleteModal, Button, Input, useToasts, APIClient, Select, PageWrapper } from 'webapps-react';
 import { confirmAlert } from 'react-confirm-alert';
 
 const _new = {
@@ -138,106 +138,86 @@ const Members = () => {
     }
 
     return (
-        <div className="mt-10 sm:mt-0 py-0 sm:py-8">
-            <div className="md:grid md:grid-cols-3 md:gap-6">
-                <div className="md:col-span-1 flex justify-between">
+        <PageWrapper>
+            <div className="grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1 flex flex-col justify-between">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Current Members</h3>
                     </div>
-                </div>
-                <div className="mt-5 md:mt-0 md:col-span-2">
-                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
-                        {
-                            members.map(function (member, i) {
-                                return (
-                                    <div key={i} className="flex flex-col md:flex-row items-center my-2">
-                                        <div className="w-full flex flex-row justify-between">
-                                            <span>{member.forename} {member.surname}</span>
-                                            <span>({member.short_name})</span>
-                                            <span>{member.team.name}</span>
-                                        </div>
-                                        <div className="flex flex-row md:ml-6">
-                                            <Button style="link" onClick={() => { setMember(member) }}>Edit</Button>
-                                            <Button style="link" color="red" onClick={() => { contextDelete(member) }}>Delete</Button>
-                                        </div>
+                    {
+                        members.map(function (member, i) {
+                            return (
+                                <div key={i} className="flex flex-col md:flex-row items-center my-2">
+                                    <div className="w-full flex flex-row justify-between">
+                                        <span>{member.forename} {member.surname}</span>
+                                        <span>({member.short_name})</span>
+                                        <span>{member.team.name}</span>
                                     </div>
-                                )
-                            })
-                        }
-                    </div>
-
-                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-                        <Button onClick={() => { setMember(null); setNewMember(_new) }}>Create New Member</Button>
-                    </div>
+                                    <div className="flex flex-row md:ml-6">
+                                        <Button type="link" onClick={() => { setMember(member) }}>Edit</Button>
+                                        <Button type="link" color="red" onClick={() => { contextDelete(member) }}>Delete</Button>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                    <Button onClick={() => { setMember(null); setNewMember(_new) }}>Create New Member</Button>
                 </div>
 
-                <div className="md:col-span-1 flex justify-between">
+                <div className="md:col-span-1 flex flex-col justify-between">
                     <div className="px-4 sm:px-0">
                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Create a new Member</h3>
                     </div>
-                </div>
 
-                <div className="mt-5 md:mt-0 md:col-span-2">
-                    <div className="px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow sm:rounded-tl-md sm:rounded-tr-md">
-                        <div className="grid grid-cols-6 gap-6">
-                            <Input
-                                id="forename"
-                                name="forename"
-                                label="Forename"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(member === null) ? newMember.forename : member.forename}
-                                onChange={onChange}
-                                state={state} />
-                            <Input
-                                id="surname"
-                                name="surname"
-                                label="Surname"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(member === null) ? newMember.surname : member.surname}
-                                onChange={onChange}
-                                state={state} />
-                            <Input
-                                id="short_name"
-                                name="short_name"
-                                label="Short Name"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(member === null) ? newMember.short_name : member.short_name}
-                                onChange={onChange}
-                                state={state} />
-                            <Select
-                                id="team_id"
-                                name="team_id"
-                                label="Member Team"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(member === null) ? newMember.team_id : member.team_id}
-                                onChange={onChange}>
-                                {
-                                    teams.map(function (team, i) {
-                                        return (<option key={i} value={team.id}>{team.name}</option>)
-                                    })
-                                }
-                            </Select>
-                            <Input
-                                id="points"
-                                name="points"
-                                label="Member Points"
-                                type="text"
-                                wrapperClassName="col-span-6 sm:col-span-4"
-                                value={(member === null) ? newMember.points : member.points}
-                                onChange={onChange}
-                                state={state} />
-                        </div>
-                    </div>
+                    <Input
+                        id="forename"
+                        name="forename"
+                        label="Forename"
+                        type="text"
+                        value={(member === null) ? newMember.forename : member.forename}
+                        onChange={onChange}
+                        state={state} />
+                    <Input
+                        id="surname"
+                        name="surname"
+                        label="Surname"
+                        type="text"
+                        value={(member === null) ? newMember.surname : member.surname}
+                        onChange={onChange}
+                        state={state} />
+                    <Input
+                        id="short_name"
+                        name="short_name"
+                        label="Short Name"
+                        type="text"
+                        value={(member === null) ? newMember.short_name : member.short_name}
+                        onChange={onChange}
+                        state={state} />
+                    <Select
+                        id="team_id"
+                        name="team_id"
+                        label="Member Team"
+                        value={(member === null) ? newMember.team_id : member.team_id}
+                        onChange={onChange}>
+                        {
+                            teams.map(function (team, i) {
+                                return (<option key={i} value={team.id}>{team.name}</option>)
+                            })
+                        }
+                    </Select>
+                    <Input
+                        id="points"
+                        name="points"
+                        label="Member Points"
+                        type="text"
+                        value={(member === null) ? newMember.points : member.points}
+                        onChange={onChange}
+                        state={state} />
 
-                    <div className="flex items-center justify-end px-4 py-3 bg-gray-50 dark:bg-gray-700 text-right sm:px-6 shadow sm:rounded-bl-md sm:rounded-br-md">
-                        <Button onClick={saveMember}>{(member === null) ? 'Create Member' : 'Save Changes'}</Button>
-                    </div>
+                    <Button onClick={saveMember}>{(member === null) ? 'Create Member' : 'Save Changes'}</Button>
                 </div>
             </div>
-        </div>
+        </PageWrapper>
     )
 }
 

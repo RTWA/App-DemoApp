@@ -1,106 +1,109 @@
 {
-    "name": "Demo App",
-    "slug": "DemoApp",
-    "version": "1.0.0",
-    "description": "A simple demo app for WebApps",
-    "repository": "https://github.com/RTWA/App-DemoApp",
-    "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path d=\"M12 14l9-5-9-5-9 5 9 5z\" /><path d=\"M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222\" /></svg>",
-    "icon_color": "#4F46E5",
-    "background_color": "#C7D2FE",
-    "author": "WebApps",
-    "menu": [{
-            "action": "teams",
-            "text": "Manage Teams",
-            "permission": "app.DemoApp.manageTeams"
-        },
-        {
-            "action": "members",
-            "text": "Manage Members",
-            "permission": "app.DemoApp.manageMembers"
-        },
-        {
-            "action": "points",
-            "text": "Add Points",
-            "permission": "app.DemoApp.addPoints"
-        },
-        {
-            "action": "settings",
-            "text": "App Settings",
-            "permission": "app.DemoApp.appSettings"
-        }
-    ],
-    "routes": [{
-            "path": "/teams",
-            "name": "Manage Teams",
-            "exact": true,
-            "component": "Teams",
-            "permission": "app.DemoApp.manageTeams"
-        },
-        {
-            "path": "/members",
-            "name": "Manage Members",
-            "exact": true,
-            "component": "Members",
-            "permission": "app.DemoApp.manageMembers"
-        },
-        {
-            "path": "/points",
-            "name": "Add Points",
-            "exact": true,
-            "component": "AddPoints",
-            "permission": "app.DemoApp.addPoints"
-        },
-        {
-            "path": "/settings",
-            "name": "App Settings",
-            "exact": true,
-            "component": "DemoAppSettings",
-            "permission": "app.DemoApp.appSettings"
-        }
-    ],
-    "permissions": [{
-            "name": "app.DemoApp.manageTeams",
-            "title": "Manage Teams",
-            "guard": "web",
-            "admin": true
-        },
-        {
-            "name": "app.DemoApp.manageMembers",
-            "title": "Manage Members",
-            "guard": "web",
-            "admin": true
-        },
-        {
-            "name": "app.DemoApp.viewPoints",
-            "title": "View Team and Members Points",
-            "guard": "web",
-            "admin": true
-        },
-        {
-            "name": "app.DemoApp.addPoints",
-            "title": "Add points to Teams and Members",
-            "guard": "web",
-            "admin": true
-        },
-        {
-            "name": "app.DemoApp.appSettings",
-            "title": "Manage App Settings",
-            "guard": "web",
-            "admin": true
-        }
-    ],
-    "settings": [
-        {
-            "key": "app.DemoApp.teamWinPoints",
-            "value": 5
-        },
-        {
-            "key": "app.DemoApp.memberWinPoints",
-            "value": 10
-        },
-        {
-            "key": "app.DemoApp.ExampleArraySetting",
-            "value": "[\"A\":true,\"B\":false]"
-        }
-    ]
+  "name": "Demo App",
+  "slug": "DemoApp",
+  "version": "1.0.2",
+  "description": "A simple demo app for WebApps",
+  "repository": "https://github.com/RTWA/App-DemoApp",
+  "icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path d=\"M12 14l9-5-9-5-9 5 9 5z\" /><path d=\"M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z\" /><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222\" /></svg>",
+  "icon_color": "#4F46E5",
+  "background_color": "#C7D2FE",
+  "author": "WebApps",
+  "menu": [
+    {
+      "action": "teams",
+      "text": "Manage Teams",
+      "permission": "app.DemoApp.manageTeams"
+    },
+    {
+      "action": "members",
+      "text": "Manage Members",
+      "permission": "app.DemoApp.manageMembers"
+    },
+    {
+      "action": "points",
+      "text": "Add Points",
+      "permission": "app.DemoApp.addPoints"
+    },
+    {
+      "action": "settings",
+      "text": "App Settings",
+      "permission": "app.DemoApp.appSettings"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/teams",
+      "name": "Manage Teams",
+      "exact": true,
+      "component": "Teams",
+      "permission": "app.DemoApp.manageTeams"
+    },
+    {
+      "path": "/members",
+      "name": "Manage Members",
+      "exact": true,
+      "component": "Members",
+      "permission": "app.DemoApp.manageMembers"
+    },
+    {
+      "path": "/points",
+      "name": "Add Points",
+      "exact": true,
+      "component": "AddPoints",
+      "permission": "app.DemoApp.addPoints"
+    },
+    {
+      "path": "/settings",
+      "name": "App Settings",
+      "exact": true,
+      "component": "DemoAppSettings",
+      "permission": "app.DemoApp.appSettings"
+    }
+  ],
+  "permissions": [
+    {
+      "name": "app.DemoApp.manageTeams",
+      "title": "Manage Teams",
+      "guard": "web",
+      "admin": true
+    },
+    {
+      "name": "app.DemoApp.manageMembers",
+      "title": "Manage Members",
+      "guard": "web",
+      "admin": true
+    },
+    {
+      "name": "app.DemoApp.viewPoints",
+      "title": "View Team and Members Points",
+      "guard": "web",
+      "admin": true
+    },
+    {
+      "name": "app.DemoApp.addPoints",
+      "title": "Add points to Teams and Members",
+      "guard": "web",
+      "admin": true
+    },
+    {
+      "name": "app.DemoApp.appSettings",
+      "title": "Manage App Settings",
+      "guard": "web",
+      "admin": true
+    }
+  ],
+  "settings": [
+    {
+      "key": "app.DemoApp.teamWinPoints",
+      "value": 5
+    },
+    {
+      "key": "app.DemoApp.memberWinPoints",
+      "value": 10
+    },
+    {
+      "key": "app.DemoApp.ExampleArraySetting",
+      "value": "[\"A\":true,\"B\":false]"
+    }
+  ]
 }
