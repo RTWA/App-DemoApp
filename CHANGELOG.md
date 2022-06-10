@@ -1,5 +1,13 @@
+# Version 1.1.0
+
+## What's Changed?
+- Updated all screens to use new WebApps UX
+
+## What's Fixed?
+- An issue preventing the App being uninstalled when using MS SQL Server database
+
 # Version 1.0.2
-## Whats's Changed?
+## What's Changed?
 - Speed improvements
 - Security improvements
 - UI improvements

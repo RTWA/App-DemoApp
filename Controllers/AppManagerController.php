@@ -44,8 +44,8 @@ class AppManagerController extends Controller
 
     public function uninstall()
     {
-        Schema::dropIfExists('app_demoApp_Teams');
         Schema::dropIfExists('app_demoApp_Members');
+        Schema::dropIfExists('app_demoApp_Teams');
         $this->dropPermissions();
         $this->dropSettings();
         $this->dropAppJS();
